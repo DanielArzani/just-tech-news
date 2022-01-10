@@ -2,9 +2,17 @@
 const { Model, Datatypes, DataTypes } = require("sequelize");
 // Get sequelize instance that holds DB login info
 const sequelize = require("../config/connection");
+// For hashing passwords
+const bcrypt = require("bcrypt");
 
 // Create User Model
-class User extends Model {}
+class User extends Model {
+  // Instance method to check password for each new instance of user
+  // So, for a better user experience on a live app, choose the async version to reduce the time a user has to wait to verify the password. Here, however, we're going to use the sync version, just to expedite test development:
+  checkPassword(loginPw) {
+    return bcrypt.compareSync(loginPw, this.password);
+  }
+}
 
 User.init(
   // Argument 1
@@ -48,6 +56,25 @@ User.init(
   },
   // Argument 2
   {
+    // Hooks, also known as lifecycle events
+    hooks: {
+      // Will fire just before a new instance of User is created
+      // Newuserdata is the object that contains the inputed data
+      async beforeCreate(newUserData) {
+        newUserData.password = await bcrypt.hash(newUserData.password, 10);
+        return newUserData;
+      },
+      // Will add the hash when users change their passwords
+      // This works of the extra option added to the query call in the update(PUT) route
+      async beforeUpdate(updatedUserData) {
+        updatedUserData.password = await bcrypt.hash(
+          updatedUserData.password,
+          10
+        );
+        return updatedUserData;
+      },
+    },
+
     // pass in our imported sequelize connection (the direct connection to our database)
     sequelize,
     // don't automatically create createdAt/updatedAt timestamp fields

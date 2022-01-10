@@ -9,7 +9,7 @@ router.get("/", (req, res) => {
   // Don't return the password, its an array because you can add more than one
   //I think the attributes are the column names
   User.findAll({
-    attributes: { exclude: ["password"] },
+    // attributes: { exclude: ["password"] },
   })
     // Return all users from the User table as JSON
     .then((dbUserData) => res.json(dbUserData))
@@ -65,11 +65,37 @@ router.post("/", (req, res) => {
     });
 });
 
+// LOGIN POST Route
+router.post("/login", (req, res) => {
+  User.findOne({
+    where: {
+      email: req.body.email,
+    },
+  }).then((dbUserData) => {
+    if (!dbUserData) {
+      res.status(400).json({ message: "No user with that email address" });
+      return;
+    }
+    // res.json({ user: dbUserData });
+
+    // Verify the user's identity by matching the password from the user and the hashed password in the database.
+    // Returns a boolean
+    const validPassword = dbUserData.checkPassword(req.body.password);
+    if (!validPassword) {
+      res.status(400).json({ message: "Incorrect password" });
+      return;
+    }
+    res.json({ user: dbUserData, message: "You are now logged in" });
+  });
+});
+
 // PUT(Update) user
 router.put("/:id", (req, res) => {
   // Step 1: Query through db and find the user
   // We are specifying what columns needs to be updated since it will match the key value pair of req.body
   User.update(req.body, {
+    // This is the updated password gets hashed as well
+    individualHooks: true,
     // Find first instance of users in Users table where id column has a val of params.id
     where: { id: req.params.id },
   })
