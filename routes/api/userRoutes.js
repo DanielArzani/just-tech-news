@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const { redirect } = require("express/lib/response");
 // Will automatically look for the index.js folder
 const { User } = require("../../models");
 

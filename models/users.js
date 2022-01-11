@@ -1,5 +1,5 @@
 // Import Model class and Datatypes object
-const { Model, Datatypes, DataTypes } = require("sequelize");
+const { Model, DataTypes } = require("sequelize");
 // Get sequelize instance that holds DB login info
 const sequelize = require("../config/connection");
 // For hashing passwords
