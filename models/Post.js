@@ -22,7 +22,7 @@ Post.init(
         isUrl: true,
       },
     },
-    // user_id will replace the values for id
+    // user_id will be the same value as User.id
     user_id: {
       type: DataTypes.INTEGER,
       references: {
