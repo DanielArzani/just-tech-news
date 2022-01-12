@@ -2,7 +2,6 @@
 const express = require("express");
 const routes = require("./routes");
 const sequelize = require("./config/connection");
-const { urlencoded } = require("express");
 
 // Variables
 const app = express();

@@ -1,6 +1,6 @@
 const router = require("express").Router();
 // Will automatically look for the index.js folder
-const { User } = require("../../models");
+const { User, Post, Vote } = require("../../models");
 
 // GET all users
 router.get("/", (req, res) => {
@@ -26,6 +26,19 @@ router.get("/:id", (req, res) => {
     where: {
       id: req.params.id,
     },
+    // Now when we query a single user, we'll receive the title information of every post they've ever voted on.
+    include: [
+      {
+        model: Post,
+        attributes: ["id", "title", "post_url", "created_at"],
+      },
+      {
+        model: Post,
+        attributes: ["title"],
+        through: Vote,
+        as: "voted_posts",
+      },
+    ],
   })
     .then((dbUserData) => {
       if (!dbUserData) {
