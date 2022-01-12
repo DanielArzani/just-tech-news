@@ -47,7 +47,6 @@ Post.init(
         isUrl: true,
       },
     },
-    // user_id will be the same value as User.id
     user_id: {
       type: DataTypes.INTEGER,
       references: {
@@ -56,7 +55,6 @@ Post.init(
       },
     },
   },
-  // Meta data
   {
     sequelize,
     freezeTableName: true,

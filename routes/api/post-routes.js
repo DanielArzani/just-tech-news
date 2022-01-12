@@ -1,17 +1,12 @@
 const router = require("express").Router();
-// In a query to the post table, we would like to retrieve not only information about each post, but also the user that posted it. With the foreign key, user_id, we can form a JOIN
 const { Post, User, Vote, Comment } = require("../../models");
 // We need this in order to use sequelize.literal()
 const sequelize = require("../../config/connection");
-
-// The created_at column is auto-generated at the time a post is created with the current date and time, thanks to Sequelize. We do not need to specify this column or the updated_at column in the model definition, because Sequelize will timestamp these fields by default unless we configure Sequelize not to.
 
 // Get all posts
 router.get("/", (req, res) => {
   console.log("=================");
   Post.findAll({
-    // Remember back in the Post model, we defined the column names to have an underscore naming convention by using the underscored: true, assignment. In Sequelize, columns are camelcase by default.
-    // This is all the attributes that will be included
     attributes: [
       "id",
       "post_url",
@@ -25,10 +20,7 @@ router.get("/", (req, res) => {
         "vote_count",
       ],
     ],
-    // Notice that the order property is assigned a nested array that orders by the created_at column in descending order. This will ensure that the latest posted articles will appear first.
     order: [["created_at", "DESC"]],
-    // This is an array of objects incase we wanted to join more than one table
-    // The only information we want from the User instance is the username column
     include: [
       {
         model: Comment,
@@ -105,9 +97,6 @@ router.post("/", (req, res) => {
     });
 });
 
-// When we vote on a post, we're technically updating that post's data
-// This PUT route needs to be defined before the /:id PUT route otherwise Express.js will think the word "upvote" is a valid parameter for /:id.
-
 // PUT api/posts/upvote
 router.put("/upvote", (req, res) => {
   // custom static method created in models/Post.js
@@ -121,10 +110,7 @@ router.put("/upvote", (req, res) => {
 
 // Update post
 router.put("/:id", (req, res) => {
-  // Doing this like how its done is userRoutes also works, this is another method
-  // If you see a 1 it means that the column was updated
   Post.update(
-    // I think this method will lock it so only the title can be changed?
     { title: req.body.title },
     {
       // Each post has its own id

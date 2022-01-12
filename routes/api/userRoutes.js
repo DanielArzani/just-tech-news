@@ -4,13 +4,9 @@ const { User, Post, Vote, Comment } = require("../../models");
 
 // GET all users
 router.get("/", (req, res) => {
-  // Find all instances of the class User
-  // Don't return the password, its an array because you can add more than one
-  //I think the attributes are the column names
   User.findAll({
-    // attributes: { exclude: ["password"] },
+    attributes: { exclude: ["password"] },
   })
-    // Return all users from the User table as JSON
     .then((dbUserData) => res.json(dbUserData))
     .catch((err) => {
       console.log(err);
@@ -20,13 +16,11 @@ router.get("/", (req, res) => {
 
 // GET user
 router.get("/:id", (req, res) => {
-  // Find first instance of User
   User.findOne({
     attributes: { exclude: ["password"] },
     where: {
       id: req.params.id,
     },
-    // Now when we query a single user, we'll receive the title information of every post they've ever voted on.
     include: [
       {
         model: Post,
@@ -69,8 +63,6 @@ router.get("/:id", (req, res) => {
 
 // POST(Create) user
 router.post("/", (req, res) => {
-  // We're using a setter to set these the username, p/w, email
-  // This is the same as the SQL command: INSERT INTO ... VALUES ...
   User.create({
     username: req.body.username,
     email: req.body.email,
@@ -96,10 +88,7 @@ router.post("/login", (req, res) => {
       res.status(400).json({ message: "No user with that email address" });
       return;
     }
-    // res.json({ user: dbUserData });
-
     // Verify the user's identity by matching the password from the user and the hashed password in the database.
-    // Returns a boolean
     const validPassword = dbUserData.checkPassword(req.body.password);
     if (!validPassword) {
       res.status(400).json({ message: "Incorrect password" });
@@ -111,12 +100,8 @@ router.post("/login", (req, res) => {
 
 // PUT(Update) user
 router.put("/:id", (req, res) => {
-  // Step 1: Query through db and find the user
-  // We are specifying what columns needs to be updated since it will match the key value pair of req.body
   User.update(req.body, {
-    // This is the updated password gets hashed as well
     individualHooks: true,
-    // Find first instance of users in Users table where id column has a val of params.id
     where: { id: req.params.id },
   })
     .then((dbUserData) => {
@@ -134,7 +119,6 @@ router.put("/:id", (req, res) => {
 });
 // DELETE a user
 router.delete("/:id", (req, res) => {
-  // destroy will delete multiple instances
   User.destroy({
     where: {
       id: req.params.id,
@@ -145,7 +129,6 @@ router.delete("/:id", (req, res) => {
         res.status(404).json("Couldn't find user");
         return;
       }
-      // Theres nothing to send here since it should be deleted, right?
       res.json(dbUserData);
     })
     .catch((err) => {
