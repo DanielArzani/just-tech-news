@@ -1,6 +1,6 @@
 const router = require("express").Router();
 // In a query to the post table, we would like to retrieve not only information about each post, but also the user that posted it. With the foreign key, user_id, we can form a JOIN
-const { Post, User, Vote } = require("../../models");
+const { Post, User, Vote, Comment } = require("../../models");
 // We need this in order to use sequelize.literal()
 const sequelize = require("../../config/connection");
 
@@ -31,8 +31,12 @@ router.get("/", (req, res) => {
     // The only information we want from the User instance is the username column
     include: [
       {
-        model: User,
-        attributes: ["username"],
+        model: Comment,
+        attributes: ["id", "comment_text", "post_id", "user_id", "created_at"],
+        include: {
+          model: User,
+          attributes: ["username"],
+        },
       },
     ],
   })
@@ -63,8 +67,12 @@ router.get("/:id", (req, res) => {
     ],
     include: [
       {
-        model: User,
-        attributes: ["username"],
+        model: Comment,
+        attributes: ["id", "comment_text", "post_id", "user_id", "created_at"],
+        include: {
+          model: User,
+          attributes: ["username"],
+        },
       },
     ],
   })

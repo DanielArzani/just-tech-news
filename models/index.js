@@ -1,6 +1,7 @@
 const User = require("./users");
 const Post = require("./Post");
 const Vote = require("./Vote");
+const Comment = require("./Comment");
 
 // This is saying that an instance of User can have many Posts(Which I think are also called pets in ORM)
 User.hasMany(Post, {
@@ -21,7 +22,7 @@ Post.belongsTo(User, {
 User.belongsToMany(Post, {
   through: Vote,
   as: "voted_posts",
-  foreignKey: "user_id,",
+  foreignKey: "user_id",
 });
 
 Post.belongsToMany(User, {
@@ -47,4 +48,22 @@ Post.hasMany(Vote, {
   foreignKey: "post_id",
 });
 
-module.exports = { User, Post, Vote };
+// For Comment Model
+
+Comment.belongsTo(User, {
+  foreignKey: "user_id",
+});
+
+Comment.belongsTo(Post, {
+  foreignKey: "post_id",
+});
+
+User.hasMany(Comment, {
+  foreignKey: "user_id",
+});
+
+Post.hasMany(Comment, {
+  foreignKey: "post_id",
+});
+
+module.exports = { User, Post, Vote, Comment };
