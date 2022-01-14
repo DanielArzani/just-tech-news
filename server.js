@@ -1,15 +1,24 @@
 // Dependencies
+const path = require("path");
 const express = require("express");
-const routes = require("./routes");
+const { create } = require("express-handlebars");
+const routes = require("./controllers");
 const sequelize = require("./config/connection");
 
 // Variables
 const app = express();
+const hbs = create();
 const PORT = process.env.PORT || 3001;
+
+// Register hbs engine with express app
+// Will automatically look for a views folder when rendering the page, most, if not all templating apps work like this
+app.engine("handlebars", hbs.engine);
+app.set("view engine", "handlebars");
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 app.use(routes);
 
 // Turn on connection to DB and Server
