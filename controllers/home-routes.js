@@ -39,12 +39,23 @@ router.get("/", (req, res) => {
       const posts = dbPostData.map((post) => post.get({ plain: true }));
       // This will loop over and map each Sequelize object into a serialized version of itself, saving the results in a new posts array. Now we can plug that array into the template. However, even though the render() method can accept an array instead of an object, that would prevent us from adding other properties to the template later on. To avoid future headaches, we can simply add the array to an object and continue passing an object to the template.
       // This will momentarily break the template again, because the template was set up to receive an object with an id property, title property, and so on. Now the only property it has access to is the posts array. Fortunately, Handlebars.js has built-in helpers that will allow you to perform minimal logic like looping over an array.
+      // This is also good since not destructuring posts actually leads to a security loophole that hackers can take advantage of
       res.render("homepage", { posts });
     })
     .catch((err) => {
       console.log(err);
       res.status(500).json(err);
     });
+});
+
+// Get login route
+router.get("/login", (req, res) => {
+  if (req.session.loggedIn) {
+    res.redirect("/");
+    return;
+  }
+  // Don't need any variables so we don't need to pass anything in
+  res.render("login");
 });
 
 module.exports = router;

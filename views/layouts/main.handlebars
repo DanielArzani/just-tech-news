@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Just Tech News</title>
+    {{! Note the css file path }}
     <link rel="stylesheet" href="/stylesheets/style.css" />
   </head>
 
@@ -13,8 +14,14 @@
         <h1>
           <a href="/">Just Tech News</a>
         </h1>
+        <nav>
+          {{! Not here to lead to another page, just to destroy the current session }}
+          <button id="logout" class="btn-no-style">logout</button>
+          <a href="/login">login</a>
+        </nav>
       </header>
       <main>
+        {{! This is where the other .handlebars files are passed in }}
         {{{body}}}
       </main>
       <footer>
@@ -22,6 +29,8 @@
       </footer>
     </div>
 
+    {{! JS Logout }}
+    <script src="/javascript/logout.js"></script>
   </body>
 
 </html>

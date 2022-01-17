@@ -76,8 +76,16 @@ router.post("/", (req, res) => {
     email: req.body.email,
     password: req.body.password,
   })
+    // This gives our server easy access to the user's user_id, username, and a Boolean describing whether or not the user is logged in.
+    // We want to make sure the session is created before we send the response back, so we're wrapping the variables in a callback. The req.session.save() method will initiate the creation of the session and then run the callback function once complete.
     .then((dbUserData) => {
-      res.json(dbUserData);
+      req.session.save(() => {
+        req.session.user_id = dbUserData.id;
+        req.session.username = dbUserData.username;
+        req.session.loggedIn = true;
+
+        res.json(dbUserData);
+      });
     })
     .catch((err) => {
       console.log(err);
@@ -93,20 +101,40 @@ router.post("/login", (req, res) => {
     },
   }).then((dbUserData) => {
     if (!dbUserData) {
-      res.status(400).json({ message: "No user with that email address" });
+      res.status(400).json({ message: "No user with that email address!" });
       return;
     }
-    // res.json({ user: dbUserData });
 
     // Verify the user's identity by matching the password from the user and the hashed password in the database.
     // Returns a boolean
     const validPassword = dbUserData.checkPassword(req.body.password);
+
     if (!validPassword) {
-      res.status(400).json({ message: "Incorrect password" });
+      res.status(400).json({ message: "Incorrect password!" });
       return;
     }
-    res.json({ user: dbUserData, message: "You are now logged in" });
+
+    req.session.save(() => {
+      // declare session variables
+      req.session.user_id = dbUserData.id;
+      req.session.username = dbUserData.username;
+      req.session.loggedIn = true;
+
+      res.json({ user: dbUserData, message: "You are now logged in!" });
+    });
   });
+});
+
+// We haven't designated a response for a Get request to the logout route so the user won't get anything by trying to request this endpoint but if they simply post data to it then the current session will be destroyed
+// Logout
+router.post("/logout", (req, res) => {
+  if (req.session.loggedIn) {
+    req.session.destroy(() => {
+      res.status(204).end();
+    });
+  } else {
+    res.status(404).end();
+  }
 });
 
 // PUT(Update) user
