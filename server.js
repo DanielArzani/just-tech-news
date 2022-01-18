@@ -1,4 +1,3 @@
-//! Needed to update sequelize from Ver. 5.21.5 to 6.1.0 to use seq-session
 // Dependencies
 const path = require("path");
 const express = require("express");
@@ -7,10 +6,11 @@ const routes = require("./controllers");
 const sequelize = require("./config/connection");
 const session = require("express-session");
 const SequelizeStore = require("connect-session-sequelize")(session.Store);
+const helpers = require("./utils/helpers");
 
 // Variables
 const app = express();
-const hbs = create();
+const hbs = create({ helpers });
 const PORT = process.env.PORT || 3001;
 const sess = {
   secret: "Super secret secret",
