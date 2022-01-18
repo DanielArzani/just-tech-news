@@ -15,9 +15,12 @@
           <a href="/">Just Tech News</a>
         </h1>
         <nav>
-          {{! Not here to lead to another page, just to destroy the current session }}
-          <button id="logout" class="btn-no-style">logout</button>
-          <a href="/login">login</a>
+          {{#if loggedIn}}
+            {{! Not here to lead to another page, just to destroy the current session }}
+            <button id="logout" class="btn-no-style">logout</button>
+          {{else}}
+            <a href="/login">login</a>
+          {{/if}}
         </nav>
       </header>
       <main>
@@ -29,8 +32,11 @@
       </footer>
     </div>
 
-    {{! JS Logout }}
-    <script src="/javascript/logout.js"></script>
+    {{! Wait—we made these changes in the main layout, but we're only passing loggedIn to the single-post.handlebars template. Fortunately, variables that are passed to view templates are automatically passed to the main layout. Thus, the single-post page is already good to go. We just need to update the homepage route to do the same.In home-routes.js, update the .get('/') route to render as appears in the following code:}}
+    {{#if loggedIn}}
+      {{! JS Logout }}
+      <script src="/javascript/logout.js"></script>
+    {{/if}}
   </body>
 
 </html>

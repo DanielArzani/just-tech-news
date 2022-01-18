@@ -40,7 +40,7 @@ router.get("/", (req, res) => {
       // This will loop over and map each Sequelize object into a serialized version of itself, saving the results in a new posts array. Now we can plug that array into the template. However, even though the render() method can accept an array instead of an object, that would prevent us from adding other properties to the template later on. To avoid future headaches, we can simply add the array to an object and continue passing an object to the template.
       // This will momentarily break the template again, because the template was set up to receive an object with an id property, title property, and so on. Now the only property it has access to is the posts array. Fortunately, Handlebars.js has built-in helpers that will allow you to perform minimal logic like looping over an array.
       // This is also good since not destructuring posts actually leads to a security loophole that hackers can take advantage of
-      res.render("homepage", { posts });
+      res.render("homepage", { posts, loggedIn: req.session.loggedIn });
     })
     .catch((err) => {
       console.log(err);
@@ -56,6 +56,58 @@ router.get("/login", (req, res) => {
   }
   // Don't need any variables so we don't need to pass anything in
   res.render("login");
+});
+
+// Get single post page
+router.get("/post/:id", (req, res) => {
+  Post.findOne({
+    where: {
+      id: req.params.id,
+    },
+    attributes: [
+      "id",
+      "post_url",
+      "title",
+      "created_at",
+      [
+        sequelize.literal(
+          "(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)"
+        ),
+        "vote_count",
+      ],
+    ],
+    include: [
+      {
+        model: Comment,
+        attributes: ["id", "comment_text", "post_id", "user_id", "created_at"],
+        include: {
+          model: User,
+          attributes: ["username"],
+        },
+      },
+      {
+        model: User,
+        attributes: ["username"],
+      },
+    ],
+  })
+    .then((dbPostData) => {
+      if (!dbPostData) {
+        res.status(404).json({ message: "No post found with this id" });
+        return;
+      }
+
+      // serialize the data
+      const post = dbPostData.get({ plain: true });
+
+      // pass data to template
+      // We are checking to see if a user is logged in and if they are not then they won't be able to see the comment text field and the upvote button
+      res.render("single-post", { post, loggedIn: req.session.loggedIn });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 });
 
 module.exports = router;

@@ -14,17 +14,21 @@ router.get("/", (req, res) => {
 
 // Create comment
 router.post("/", (req, res) => {
-  Comment.create({
-    comment_text: req.body.comment_text,
-    user_id: req.body.user_id,
-    post_id: req.body.post_id,
-  })
-    .then((dbCommentData) => {
-      res.json(dbCommentData);
+  // Check the session
+  if (req.session) {
+    Comment.create({
+      comment_text: req.body.comment_text,
+      // Here we use the id saved from the session
+      user_id: req.session.user_id,
+      post_id: req.body.post_id,
     })
-    .catch((err) => {
-      res.status(400).json(err);
-    });
+      .then((dbCommentData) => {
+        res.json(dbCommentData);
+      })
+      .catch((err) => {
+        res.status(400).json(err);
+      });
+  }
 });
 
 // Delete Comment
