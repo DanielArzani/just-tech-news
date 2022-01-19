@@ -1,0 +1,40 @@
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Just Tech News</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>
+          <a href="/">Just Tech News</a>
+        </h1>
+        <nav>
+          {{#if loggedIn}}
+            <a href="/dashboard">dashboard</a>
+            <button id="logout" class="btn-no-style">logout</button>
+          {{else}}
+            <a href="/login">login</a>
+          {{/if}}
+        </nav>
+      </header>
+      <main>
+        {{{body}}}
+      </main>
+      <footer>
+        Thanks for visiting!
+      </footer>
+    </div>
+
+    {{! Wait—we made these changes in the main layout, but we're only passing loggedIn to the single-post.handlebars template. Fortunately, variables that are passed to view templates are automatically passed to the main layout. Thus, the single-post page is already good to go. We just need to update the homepage route to do the same.In home-routes.js, update the .get('/') route to render as appears in the following code:}}
+    {{#if loggedIn}}
+      {{! JS Logout }}
+      <script src="/javascript/logout.js"></script>
+    {{/if}}
+  </body>
+
+</html>
