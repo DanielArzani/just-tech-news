@@ -3,6 +3,8 @@ const router = require("express").Router();
 const { Post, User, Vote, Comment } = require("../../models");
 // We need this in order to use sequelize.literal()
 const sequelize = require("../../config/connection");
+// Auth gaurd so non logged in users can't post comments and do stuff that logged in users can
+const withAuth = require("../../utils/auth");
 
 // The created_at column is auto-generated at the time a post is created with the current date and time, thanks to Sequelize. We do not need to specify this column or the updated_at column in the model definition, because Sequelize will timestamp these fields by default unless we configure Sequelize not to.
 
@@ -94,7 +96,7 @@ router.post("/", (req, res) => {
   Post.create({
     title: req.body.title,
     post_url: req.body.post_url,
-    user_id: req.body.user_id,
+    user_id: req.session.user_id,
   })
     .then((dbPostData) => {
       res.json(dbPostData);

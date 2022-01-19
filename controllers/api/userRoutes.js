@@ -1,6 +1,7 @@
 const router = require("express").Router();
 // Will automatically look for the index.js folder
 const { User, Post, Vote, Comment } = require("../../models");
+const withAuth = require("../../utils/auth");
 
 // GET all users
 router.get("/", (req, res) => {
